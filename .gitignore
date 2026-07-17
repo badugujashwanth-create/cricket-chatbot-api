@@ -1,8 +1,11 @@
 node_modules/
+test-results/
+playwright-report/
 *.log
 *.err.log
 .env
 chroma_db/
+chroma.sqlite3
 chroma_manifest.json
 cleaned_balls_all_matches.csv
 cleaned_balls_all_matches.csv.tmp
