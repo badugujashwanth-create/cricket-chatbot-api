@@ -1,10 +1,10 @@
 # Cricket Chat Bot Backend
 
-> **Status: Active Development** — Core fallback behavior runs locally; one routing regression remains in the configured test suite.
+> **Status: Active Development** — Routing, typed degraded responses, startup, and endpoint smoke checks pass; the optional local Chroma archive is not populated in this checkout.
 
 [![Watch the Cricket Intelligence API demo](docs/demo/demo-thumbnail.png)](docs/demo/demo.webm)
 
-> Watch the verified terminal/API walkthrough, including the current test failure and optional Chroma boundary.
+> Watch the verified terminal/API walkthrough, including the repaired team response and optional Chroma boundary.
 
 Express backend for the Cricket Chat Bot. It serves the frontend build, exposes cricket APIs, routes natural-language questions, reads the local Chroma semantic archive, enriches player entities through provider APIs, and pushes live match alerts through Socket.IO.
 
