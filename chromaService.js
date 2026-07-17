@@ -583,6 +583,16 @@ async function queryVectorDb(query = '', { k = 5, dbDir = '', collection = DEFAU
   if (cached) return cached;
 
   const mode = resolveChromaMode({ dbDir: resolvedDbDir });
+  if (mode === 'local' && !resolvedDbDir) {
+    return {
+      available: false,
+      db_dir: '',
+      collection,
+      query: cleanQuery,
+      results: [],
+      warning: 'missing_chroma_db'
+    };
+  }
   const attemptLocalFirst = mode === 'local';
 
   try {
@@ -639,6 +649,15 @@ async function getCollectionDocs(
 ) {
   const resolvedDbDir = dbDir || resolveDbDir();
   const mode = resolveChromaMode({ dbDir: resolvedDbDir });
+  if (mode === 'local' && !resolvedDbDir) {
+    return {
+      available: false,
+      db_dir: '',
+      collection,
+      docs: [],
+      warning: 'missing_chroma_db'
+    };
+  }
   const attemptLocalFirst = mode === 'local';
   const readDocs = attemptLocalFirst ? getCollectionDocsLocal : getCollectionDocsServer;
 

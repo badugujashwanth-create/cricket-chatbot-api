@@ -2150,6 +2150,19 @@ async function runTeamStats(route, question) {
     ...buildPhraseCandidates(explicitTeam)
   ]);
   if (resolution.status !== 'resolved') {
+    const canonicalTeam = extractExplicitCricketTeamName(question);
+    if (canonicalTeam) {
+      return {
+        answer: `I could not find archived matches or win statistics for ${canonicalTeam} in the verified dataset.`,
+        data: {
+          type: 'team_stats',
+          title: canonicalTeam,
+          team: { name: canonicalTeam },
+          stats: {}
+        },
+        followups: [`Show recent ${canonicalTeam} matches`, 'Show live scores', 'Show upcoming matches']
+      };
+    }
     return unresolvedEntityResult('team', teamQuery, resolution);
   }
   const team = resolution.item;
