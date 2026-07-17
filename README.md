@@ -1,6 +1,14 @@
 # Cricket Chat Bot Backend
 
+> **Status: Active Development** — Routing, typed degraded responses, startup, and endpoint smoke checks pass; the optional local Chroma archive is not populated in this checkout.
+
+[![Watch the Cricket Intelligence API demo](docs/demo/demo-thumbnail.png)](docs/demo/demo.webm)
+
+> Watch the verified terminal/API walkthrough, including the repaired team response and optional Chroma boundary.
+
 Express backend for the Cricket Chat Bot. It serves the frontend build, exposes cricket APIs, routes natural-language questions, reads the local Chroma semantic archive, enriches player entities through provider APIs, and pushes live match alerts through Socket.IO.
+
+It helps cricket fans and analysts turn plain-language questions into structured summaries, comparisons, records, and chart-ready responses without coupling the interface to one data provider.
 
 ## Architecture
 
@@ -82,7 +90,7 @@ backend/
 ## Installation
 
 ```powershell
-cd "d:\projects\cricket chat bot\backend"
+cd Cricket_chatbot_Backend
 npm install
 ```
 
@@ -131,7 +139,7 @@ RUN_DAILY_INGESTOR_ON_BOOT=false
 ## Running Locally
 
 ```powershell
-cd "d:\projects\cricket chat bot\backend"
+cd Cricket_chatbot_Backend
 npm start
 ```
 
@@ -273,7 +281,7 @@ It does not maintain a secondary archive store.
 ## Testing
 
 ```powershell
-cd "d:\projects\cricket chat bot\backend"
+cd Cricket_chatbot_Backend
 npm run test:cases
 ```
 
@@ -320,3 +328,14 @@ The backend can still answer deterministic archive and knowledge questions. For 
 - `Who won the 2011 World Cup?`
 - `What is LBW?`
 - `Show recent live scores`
+
+## Related repositories
+
+- **Frontend:** [Cricket_chatbot_frontend](https://github.com/badugujashwanth-create/Cricket_chatbot_frontend) — React/Vite chat interface and chart rendering.
+- **Backend:** this repository — routing, datasets, providers, retrieval, API, and live events.
+
+See [docs/TEST_REPORT.md](docs/TEST_REPORT.md) for current verification and [docs/demo/DEMO_SCRIPT.md](docs/demo/DEMO_SCRIPT.md) for the shared product demo plan.
+
+## License status
+
+No license file is currently present. All rights remain with the copyright holder unless a license is added manually.

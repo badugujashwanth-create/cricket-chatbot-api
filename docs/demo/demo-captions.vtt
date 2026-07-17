@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00.000 --> 00:12.000
+Cricket Intelligence API starts successfully in production mode.
+
+00:12.000 --> 00:24.000
+The health endpoint returns HTTP 200 and accurately reports that the optional Chroma archive is empty.
+
+00:24.000 --> 00:36.000
+A recognized India team query returns the frontend-compatible team and team_stats response without inventing statistics.
+
+00:36.000 --> 00:48.000
+The configured routing and response-shape suite passes, while optional empty-archive record checks are skipped explicitly.
+
+00:48.000 --> 01:01.000
+Express, Socket.IO, deterministic routing, typed responses, optional Chroma retrieval, and the verified API smoke checks.
