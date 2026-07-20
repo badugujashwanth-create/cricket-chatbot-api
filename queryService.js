@@ -51,6 +51,10 @@ const {
   isFormatComparisonQuestion
 } = require('./naturalIntentGate');
 
+const PROFILE_ENRICHMENT_ENABLED = ['1', 'true', 'yes'].includes(
+  String(process.env.PROFILE_ENRICHMENT_ENABLED || 'false').trim().toLowerCase()
+);
+
 const YEAR_REGEX = /\b(19\d{2}|20\d{2})\b/;
 const MATCH_ID_REGEX = /\b(\d{5,})\b/;
 const LIVE_QUERY_REGEX = /\b(live|current|ongoing|now|today|score|scores|scorecard|latest)\b/;
@@ -725,6 +729,8 @@ function buildUnifiedExtra(details = {}, summary = '', answer = '', suggestions 
     answer_mode: String(details.answer_mode || '').trim(),
     time_context: String(details.time_context || '').trim(),
     confidence: Number.isFinite(Number(details.confidence)) ? Number(details.confidence) : undefined,
+    evidence_state: String(details.evidence_state || '').trim(),
+    archive_evidence: Boolean(details.archive_evidence),
     subtitle: String(details.subtitle || '').trim(),
     suggestions,
     insights,
@@ -988,6 +994,7 @@ function stripWikiMarkup(value = '') {
 }
 
 async function fetchWikipediaSummary(topic = '') {
+  if (!PROFILE_ENRICHMENT_ENABLED) return null;
   const cleanTopic = String(topic || '').trim();
   if (!cleanTopic) return null;
   const cacheKey = cleanTopic.toLowerCase();
@@ -1026,6 +1033,7 @@ async function fetchWikipediaSummary(topic = '') {
 }
 
 async function fetchWikipediaWikitext(topic = '') {
+  if (!PROFILE_ENRICHMENT_ENABLED) return '';
   const cleanTopic = String(topic || '').trim();
   if (!cleanTopic) return '';
   const cacheKey = cleanTopic.toLowerCase();
@@ -2624,6 +2632,7 @@ async function runRecordLookup(route, question) {
       answer: knownRecord.answer,
       data: {
         type: 'record_lookup',
+        source_label: 'Local Knowledge',
         title: knownRecord.title,
         question: String(question || '').trim(),
         metric: knownRecord.metric,
@@ -3246,12 +3255,17 @@ function buildPublicDetails(
     : extractDetectedEntitiesFallback(route, data, fallbackSummary, cricApiContext);
   const normalizedQuestion = normalizeText(question);
   const providerStatus = buildProviderStatus(cricApiContext?.errors || []);
+  const archiveEvidence = responseSources.some((source) =>
+    ['Vector Archive', 'Vector DB'].includes(String(source || '').trim())
+  );
   const responseMeta = {
     intent: String(route.action || '').trim(),
     sub_intent: String(route.sub_intent || '').trim(),
     answer_mode: String(route.answer_mode || '').trim(),
     time_context: String(route.time_context || '').trim(),
-    confidence: Number.isFinite(Number(route.confidence)) ? Number(route.confidence) : undefined
+    confidence: Number.isFinite(Number(route.confidence)) ? Number(route.confidence) : undefined,
+    evidence_state: responseSources.length ? 'available' : 'unavailable',
+    archive_evidence: archiveEvidence
   };
   const withDetectedEntities = (payload = {}) =>
     pruneEmptyFields({
@@ -4450,6 +4464,59 @@ async function enrichStructuredResult(structuredContext = {}, route = {}, questi
   return structuredContext;
 }
 
+function hasPositiveNumericValue(values = {}) {
+  return Object.values(values && typeof values === 'object' ? values : {}).some(
+    (value) => Number.isFinite(Number(value)) && Number(value) > 0
+  );
+}
+
+function hasStructuredArchiveEvidence(data = {}) {
+  const type = String(data.type || '').trim();
+  const stats = data.stats && typeof data.stats === 'object' ? data.stats : {};
+  const recentMatches = Array.isArray(data.recent_matches)
+    ? data.recent_matches
+    : Array.isArray(stats.recent_matches)
+      ? stats.recent_matches
+      : [];
+
+  if (type === 'player_stats' || type === 'player_season_stats') {
+    return (
+      hasPositiveNumericValue(stats) ||
+      hasPositiveNumericValue(data.player?.stats || {}) ||
+      recentMatches.length > 0
+    );
+  }
+  if (type === 'team_stats' || type === 'team_info') {
+    return hasPositiveNumericValue(stats) || recentMatches.length > 0;
+  }
+  if (type === 'team_squad' || type === 'playing_xi') {
+    return Array.isArray(data.players) && data.players.length > 0;
+  }
+  if (type === 'match_summary') {
+    const match = data.match && typeof data.match === 'object' ? data.match : {};
+    return Boolean(
+      String(match.id || match.summary || match.result || '').trim() ||
+        (Array.isArray(match.teams) && match.teams.length >= 2)
+    );
+  }
+  if (type === 'compare_players') {
+    return (
+      hasPositiveNumericValue(data.left?.stats || data.left || {}) ||
+      hasPositiveNumericValue(data.right?.stats || data.right || {})
+    );
+  }
+  if (type === 'head_to_head') {
+    return hasPositiveNumericValue(stats) || recentMatches.length > 0;
+  }
+  if (type === 'top_players' || type === 'record_lookup') {
+    return (
+      (Array.isArray(data.rows) && data.rows.length > 0) ||
+      hasPositiveNumericValue(stats)
+    );
+  }
+  return false;
+}
+
 function buildSourceList(
   structuredContext,
   vectorContext,
@@ -4459,13 +4526,17 @@ function buildSourceList(
   espnContext = {}
 ) {
   const sources = [];
+  const structuredData = structuredContext?.result?.data || {};
   const structuredType = String(structuredContext?.result?.data?.type || '').trim();
   if (structuredContext?.available) {
-    if (structuredType === 'general_knowledge') {
+    const explicitSource = String(structuredData.source_label || '').trim();
+    if (explicitSource) {
+      sources.push(explicitSource);
+    } else if (structuredType === 'general_knowledge') {
       sources.push('Local Knowledge');
     } else if (structuredType === 'glossary') {
       sources.push('Glossary');
-    } else {
+    } else if (hasStructuredArchiveEvidence(structuredData)) {
       sources.push('Vector Archive');
     }
   }

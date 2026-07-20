@@ -32,7 +32,8 @@ records, training           ESPN · profile enrichment · LLM
 
 - Missing repository evidence returns guidance or typed unavailable data instead of invented statistics.
 - Missing provider credentials return explicit external-source errors.
-- Missing Chroma data returns `missing_chroma_db` without starting a helper for a nonexistent path.
+- Missing Chroma data returns `missing_chroma_db` without starting a helper, reading stale semantic-cache entries, or creating cache files at an implicit path.
+- Wikipedia enrichment returns immediately without a network call unless `PROFILE_ENRICHMENT_ENABLED=true` is set explicitly.
 - Status responses sanitize machine paths and expose only boolean capabilities.
 - Provider enrichment failures do not upgrade a local fact into a live-data claim.
 

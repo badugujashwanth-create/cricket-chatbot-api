@@ -86,6 +86,13 @@ test('recognized team query preserves its typed degraded contract', async () => 
   assert.equal(payload.type, 'team');
   assert.equal(payload.extra.action, 'team_stats');
   assert.match(payload.summary, /india|unavailable|dataset/i);
+  assert.equal(payload.image, '');
+  assert.equal(payload.extra.evidence_state, 'unavailable');
+  assert.equal(payload.extra.archive_evidence, false);
+  assert.deepEqual(payload.extra.sources || [], []);
+  assert.equal(Object.hasOwn(payload.extra, 'team_description'), false);
+  assert.equal(Object.hasOwn(payload.extra.entities.team, 'wikipedia_url'), false);
+  assert.equal(Object.hasOwn(payload.extra.entities.team, 'image_url'), false);
 });
 
 test('empty questions and unconfigured live providers fail honestly', async () => {

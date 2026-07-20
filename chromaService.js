@@ -739,6 +739,15 @@ async function querySemanticCache(
 
   const resolvedDbDir = dbDir || resolveDbDir();
   const mode = resolveChromaMode({ dbDir: resolvedDbDir });
+  if (mode === 'local' && !resolvedDbDir) {
+    return {
+      hit: false,
+      question: cleanQuestion,
+      collection,
+      results: [],
+      warning: 'missing_chroma_db'
+    };
+  }
 
   try {
     let payload = null;
@@ -852,6 +861,12 @@ async function saveSemanticCacheEntry(
 
   const resolvedDbDir = dbDir || resolveDbDir();
   const mode = resolveChromaMode({ dbDir: resolvedDbDir });
+  if (mode === 'local' && !resolvedDbDir) {
+    return {
+      saved: false,
+      reason: 'missing_chroma_db'
+    };
+  }
 
   try {
     if (mode === 'local') {
