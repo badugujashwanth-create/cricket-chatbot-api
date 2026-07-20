@@ -1,18 +1,29 @@
 # Troubleshooting
 
-## Installation fails
+## Dependency install fails
 
-Use the package manager and lockfile already committed to this repository. Confirm the required runtime is installed, clear only generated caches, and retry the install command from [DEVELOPMENT.md](DEVELOPMENT.md).
+Use Node.js 22+ and the committed lockfile: `npm ci`. Do not delete source or data files while clearing generated npm caches.
 
-## The application starts but a feature is unavailable
+## Live/provider endpoint returns 503
 
-Check the browser or terminal error first, then verify the documented environment variables and dependent services. A Chroma server, local helper, or provider credentials may be needed for enhanced retrieval; the current regression assertion is unresolved.
+That is expected in deterministic mode. Provider routes require an authorized key and the corresponding opt-in flag. Do not add a key merely to make a portfolio demo look live.
 
-## Tests and builds
+## Archive status is missing
 
-Run checks from the component directory shown in [TEST_REPORT.md](TEST_REPORT.md). A successful dependency install is not evidence that a test or production build passed.
+The v1.0 profile does not ship a populated Chroma archive. Repository knowledge still works. Configure and build an archive only from data you may legally use, then document its provenance.
 
-## Sensitive configuration
+## CORS returns 403
 
-Never paste real credentials into an issue or screenshot. Replace local configuration values with placeholders before sharing diagnostic output.
+Add the exact trusted client origin to `CORS_ORIGINS`. Wildcard origins are not the release default.
 
+## JSON returns 413
+
+The default request-body limit is 32 kB. Questions should be small. Raise `JSON_BODY_LIMIT` only after reviewing abuse and memory impact.
+
+## Port is already in use
+
+Stop the process already bound to the port or set a different `PORT`. Do not run duplicate demo servers.
+
+## Sensitive diagnostics
+
+Never paste real credentials, provider headers, private URLs, or personal paths into issues, screenshots, recordings, or test artifacts.

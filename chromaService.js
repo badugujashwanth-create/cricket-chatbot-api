@@ -23,7 +23,7 @@ const VECTOR_CACHE_TTL_MS = 5 * 60 * 1000;
 const VECTOR_CACHE_LIMIT = 100;
 const COLLECTION_GET_BATCH_LIMIT = 10000;
 const LOCAL_HELPER_TIMEOUT_MS = Number(process.env.CHROMA_HELPER_TIMEOUT_MS || 30000);
-const EXPLICIT_CHROMA_MODE = normalizeText(process.env.CHROMA_MODE || 'auto') || 'auto';
+const EXPLICIT_CHROMA_MODE = normalizeText(process.env.CHROMA_MODE || 'local') || 'local';
 const PYTHON_BIN = String(process.env.CHROMA_PYTHON_BIN || process.env.PYTHON_BIN || '').trim();
 const CHROMA_DEBUG =
   String(process.env.CHROMA_DEBUG || '').trim().toLowerCase() === 'true' ||
@@ -562,7 +562,8 @@ async function getCollectionDocsPaginated(
 
 async function queryVectorDb(query = '', { k = 5, dbDir = '', collection = DEFAULT_COLLECTION } = {}) {
   const cleanQuery = String(query || '').trim();
-  const resolvedDbDir = dbDir || resolveDbDir();
+  const requestedDbDir = String(dbDir || '').trim();
+  const resolvedDbDir = requestedDbDir ? existingPath(requestedDbDir) : resolveDbDir();
   if (!cleanQuery) {
     return {
       available: false,
@@ -571,6 +572,16 @@ async function queryVectorDb(query = '', { k = 5, dbDir = '', collection = DEFAU
       query: cleanQuery,
       results: [],
       warning: 'empty_query'
+    };
+  }
+  if (requestedDbDir && !resolvedDbDir) {
+    return {
+      available: false,
+      db_dir: '',
+      collection,
+      query: cleanQuery,
+      results: [],
+      warning: 'missing_chroma_db'
     };
   }
 

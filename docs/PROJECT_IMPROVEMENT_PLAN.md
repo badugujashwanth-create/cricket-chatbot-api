@@ -1,35 +1,24 @@
-# Project Improvement Plan
+# Project improvement plan
 
-## Current state
+## Completed P0
 
-The API grounds answers in local cricket data and now has 19 regression cases covering routing, normalization, status, validation, startup, and degraded behavior.
+- remove vulnerable dependency state;
+- make all external/provider behavior opt-in;
+- add CORS, body-size, rate-limit, and security-header controls;
+- sanitize runtime evidence;
+- add real HTTP integration coverage;
+- stop missing archives before spawning Python helpers;
+- replace the one-minute legacy recording with a verified three-minute-plus walkthrough;
+- align README, architecture, tests, security, limitations, and release evidence.
 
-## Findings
+## Remaining P1
 
-- **Works:** deterministic route selection, player/team normalization paths, invalid-input handling, unsupported-query behavior, and tested degraded mode.
-- **Does not / missing:** complete dataset provenance/coverage, exhaustive statistical calculations, and a populated optional archive path.
-- **UX / architecture:** backend boundaries are clear; evidence should accompany every computed statistic consumed by the frontend.
-- **Testing / security:** regression suite is meaningful. Abuse/rate behavior, large-query bounds, and a broader statistical oracle remain gaps.
-- **Performance / docs / demo:** representative latency is not benchmarked. Demo is good but cannot prove questions outside the dataset.
+- add item-level citations and licensing review for curated data;
+- define and build an authorized archive fixture with deterministic expected statistics;
+- add Socket.IO connection and SSE cancellation tests;
+- benchmark representative local queries;
+- add authentication and tenant boundaries only if a public multi-user deployment is authorized.
 
-## Recommendations
+## Excluded from v1.0
 
-### Critical
-
-- Never allow language-model output to invent unsupported statistics.
-- Keep all 19 route/degraded regression cases green and preserve explicit unsupported responses.
-
-### High value
-
-- Add provenance metadata and golden calculations for the most common comparison/leaderboard queries.
-- Add request-size/rate protections if deployed publicly.
-
-### Optional
-
-- Expand datasets only with documented licensing and provenance.
-
-## Delivery constraints
-
-- **Priority:** accuracy and evidence; **complexity:** medium; **dependencies:** local datasets and current API stack.
-- **Acceptance:** tested calculations match fixtures, unsupported questions fail honestly, startup/build checks pass, and provenance is visible.
-- **Excluded:** live score scraping, invented facts, and broad generative sports commentary.
+Live-score guarantees, scraping, official rankings, betting or fantasy recommendations, invented statistics, broad generative commentary, public hosting, and unverified model/provider claims.

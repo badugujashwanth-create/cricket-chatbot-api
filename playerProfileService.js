@@ -4,6 +4,9 @@ const { normalizeText, similarityScore, tokenize } = require('./textUtils');
 
 const PROFILE_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 const PROFILE_CACHE_LIMIT = 300;
+const PROFILE_ENRICHMENT_ENABLED = ['1', 'true', 'yes'].includes(
+  String(process.env.PROFILE_ENRICHMENT_ENABLED || 'false').trim().toLowerCase()
+);
 const profileCache = new Map();
 
 function getCacheKey(query = '', datasetName = '') {
@@ -73,6 +76,7 @@ function chooseBaseCanonicalName(query = '', datasetName = '') {
 }
 
 async function fetchWikipediaSummary(playerName = '') {
+  if (!PROFILE_ENRICHMENT_ENABLED) return null;
   const cleanPlayerName = String(playerName || '').trim();
   if (!cleanPlayerName) return null;
 
@@ -101,6 +105,7 @@ async function fetchWikipediaSummary(playerName = '') {
 }
 
 async function fetchExternalPlayer(query = '', datasetName = '') {
+  if (!PROFILE_ENRICHMENT_ENABLED) return null;
   const searchTerms = [query, datasetName].map((value) => String(value || '').trim()).filter(Boolean);
   for (const term of searchTerms) {
     try {

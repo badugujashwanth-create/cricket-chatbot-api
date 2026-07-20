@@ -4,7 +4,7 @@ const LOCAL_ENDPOINT =
   process.env.LLM_ENDPOINT ||
   (process.env.LLM_BASE_URL
     ? `${String(process.env.LLM_BASE_URL).replace(/\/+$/, '')}/chat/completions`
-    : 'http://localhost:8080/v1/chat/completions');
+    : '');
 const LOCAL_MODEL = process.env.LLM_MODEL || 'local';
 const DEFAULT_TIMEOUT_MS = Number(process.env.LLM_TIMEOUT_MS || 30000);
 
@@ -23,7 +23,7 @@ function normalizeChatCompletionsUrl(value = '') {
 }
 
 function localEndpointUrl() {
-  return normalizeChatCompletionsUrl(LOCAL_ENDPOINT) || 'http://localhost:8080/v1/chat/completions';
+  return normalizeChatCompletionsUrl(LOCAL_ENDPOINT);
 }
 
 function openAiEndpointUrl() {
@@ -189,6 +189,7 @@ async function callLlama(messages = [], options = {}) {
 function getLlmConfigSummary() {
   return {
     local_endpoint: localEndpointUrl(),
+    local_enabled: hasLocalLlm(),
     local_model: LOCAL_MODEL,
     openai_enabled: hasOpenAiLlm(),
     openai_model: OPENAI_MODEL,

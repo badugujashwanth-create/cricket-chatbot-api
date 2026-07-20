@@ -1,16 +1,28 @@
 WEBVTT
 
-00:00.000 --> 00:12.000
-Cricket Intelligence API starts successfully in production mode.
+00:00.000 --> 00:25.000
+Cricket Intelligence API starts in deterministic local mode with no external providers, enrichment, models, or ingestion.
 
-00:12.000 --> 00:24.000
-The health endpoint returns HTTP 200 and accurately reports that the optional Chroma archive is empty.
+00:25.000 --> 00:55.000
+The status endpoint exposes the repository snapshot and provider capability flags without leaking a filesystem path.
 
-00:24.000 --> 00:36.000
-A recognized India team query returns the frontend-compatible team and team_stats response without inventing statistics.
+00:55.000 --> 01:25.000
+A real API request answers the LBW question from checked-in repository knowledge.
 
-00:36.000 --> 00:48.000
-The configured routing and response-shape suite passes, while optional empty-archive record checks are skipped explicitly.
+01:25.000 --> 01:55.000
+The selected 2011 World Cup fact is returned from the curated history snapshot.
 
-00:48.000 --> 01:01.000
-Express, Socket.IO, deterministic routing, typed responses, optional Chroma retrieval, and the verified API smoke checks.
+01:55.000 --> 02:25.000
+The India query preserves its team response contract while clearly reporting that archive statistics are unavailable.
+
+02:25.000 --> 02:50.000
+The unconfigured live-score boundary returns HTTP 503 with an external-provider label.
+
+02:50.000 --> 03:15.000
+The API denies an untrusted origin, rejects an oversized body, adds security headers, and hides the Express signature.
+
+03:15.000 --> 03:45.000
+Nineteen routing cases and five real HTTP tests pass; the runtime dependency audit reports zero known vulnerabilities.
+
+03:45.000 --> 04:20.000
+Architecture, data provenance debt, optional adapters, and the release non-claims remain explicit.

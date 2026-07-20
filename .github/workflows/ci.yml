@@ -2,7 +2,7 @@ name: API verification
 
 on:
   push:
-    branches: [main, portfolio-polish]
+    branches: [main]
   pull_request:
 
 permissions:
@@ -18,4 +18,5 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      - run: npm run test:cases
+      - run: npm test
+      - run: npm audit --omit=dev
