@@ -2109,7 +2109,7 @@ async function runPlayerAction(action, route, question) {
     answer: uniqueNonEmpty([
       hasMeaningfulStats(stats)
         ? `${player.name} has ${formatStatValue(stats.runs)} runs from ${formatStatValue(stats.matches)} archived matches, with an average of ${formatStatValue(stats.average)} and strike rate ${formatStatValue(stats.strike_rate)}.`
-        : `${player.name} was resolved as the active player match, but detailed archive totals are currently limited. Live and fallback profile sources will be used to enrich the response.`,
+        : `${player.name} was resolved as the active player match, but detailed archive totals are unavailable in the current dataset.`,
       stats.wickets ? `${player.name} has also taken ${formatStatValue(stats.wickets)} wickets.` : '',
       scopeNote
     ]).join(' '),

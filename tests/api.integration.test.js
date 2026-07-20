@@ -93,6 +93,21 @@ test('recognized team query preserves its typed degraded contract', async () => 
   assert.equal(Object.hasOwn(payload.extra, 'team_description'), false);
   assert.equal(Object.hasOwn(payload.extra.entities.team, 'wikipedia_url'), false);
   assert.equal(Object.hasOwn(payload.extra.entities.team, 'image_url'), false);
+
+  const playerResponse = await request('/api/query', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ question: 'Who is Virat Kohli?', sessionId: 'integration-player-demo' })
+  });
+  assert.equal(playerResponse.status, 200);
+  const playerPayload = await playerResponse.json();
+  assert.equal(playerPayload.type, 'player');
+  assert.equal(playerPayload.extra.action, 'player_stats');
+  assert.equal(playerPayload.extra.evidence_state, 'unavailable');
+  assert.equal(playerPayload.extra.archive_evidence, false);
+  assert.deepEqual(playerPayload.extra.sources || [], []);
+  assert.match(playerPayload.summary, /unavailable in the current dataset/i);
+  assert.doesNotMatch(playerPayload.summary, /will be used|fallback profile|live and fallback/i);
 });
 
 test('empty questions and unconfigured live providers fail honestly', async () => {
