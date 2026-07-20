@@ -1,0 +1,27 @@
+{
+    "generated_at_utc":  "2026-07-20T18:55:54.0519567Z",
+    "duration_seconds":  260.742,
+    "width":  1280,
+    "height":  720,
+    "video_codec":  "vp9",
+    "audio_codec":  "opus",
+    "capture":  "Dedicated Windows PowerShell terminal via FFmpeg gdigrab",
+    "data_boundary":  "Repository-curated public examples; all external providers and models disabled",
+    "workflow":  "Status -\u003e rules -\u003e history -\u003e typed degradation -\u003e provider gate -\u003e HTTP security -\u003e tests -\u003e audit -\u003e architecture",
+    "captions":  "demo-captions.vtt",
+    "sha256":  "9feee2c94ac05e7b95c28561d958ccf76facad6f7c24837bef15371ff5cf58c0",
+    "bytes":  5677538,
+    "verification_frames":  10,
+    "frame_timestamps":  [
+                             "00:00:10",
+                             "00:00:35",
+                             "00:01:05",
+                             "00:01:35",
+                             "00:02:05",
+                             "00:02:35",
+                             "00:03:00",
+                             "00:03:25",
+                             "00:03:55",
+                             "00:04:15"
+                         ]
+}

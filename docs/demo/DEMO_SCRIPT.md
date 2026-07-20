@@ -1,17 +1,21 @@
 # Cricket Intelligence API demo script
 
-**Target length:** 60 seconds
+**Target length:** 4:15
 
-**Format:** API/terminal
+**Format:** real PowerShell and HTTP/API workflow
 
-**Data:** synthetic, repository-provided demo data, or public non-personal examples only
+**Data:** repository-curated public cricket examples; no accounts, credentials, or external calls
 
 ## Walkthrough
 
-1. **Title and startup (0–12s):** Show the Cricket Intelligence API and its successful production-mode startup.
-2. **Health boundary (12–24s):** Call `/api/status` and disclose that the optional local Chroma archive is empty.
-3. **Primary workflow (24–36s):** Submit one recognized team query and show the typed `team`/`team_stats` degraded response without invented statistics.
-4. **Verification (36–48s):** Show the passing configured routing suite and the explicit empty-archive limitation.
-5. **Architecture and close (48–60s):** Name the main runtime boundaries, verified smoke checks, repository owner, and remaining optional-data limitation.
+1. **0:00–0:25 — Product and boundary:** identify the question-to-evidence problem and show deterministic mode.
+2. **0:25–0:55 — Runtime status:** show archive state and every provider flag as false.
+3. **0:55–1:25 — Rule knowledge:** submit `what is lbw` and inspect the typed local answer.
+4. **1:25–1:55 — History knowledge:** submit `who won wc 2011` from the curated snapshot.
+5. **1:55–2:25 — Typed degradation:** submit `india team summary`; retain `team/team_stats` while saying statistics are unavailable.
+6. **2:25–2:50 — External gate:** call live scores and show the explicit CricAPI `503`.
+7. **2:50–3:15 — HTTP security:** demonstrate denied CORS and oversized-body responses.
+8. **3:15–3:45 — Verification:** run 19 routing cases, 5 HTTP tests, and the npm audit.
+9. **3:45–4:15 — Architecture and limits:** summarize adapter boundaries, provenance debt, and non-claims.
 
-Do not show environment files, tokens, browser bookmarks, notifications, real user accounts, private URLs, or local filesystem paths. Do not edit the footage to imply an integration succeeded when it did not.
+Do not show `.env`, provider headers, personal paths, notifications, private URLs, or invented success states.

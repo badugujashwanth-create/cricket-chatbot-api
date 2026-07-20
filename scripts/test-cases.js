@@ -8,6 +8,8 @@ process.env.LLM_TIMEOUT_MS ||= '1500';
 require('../loadEnv');
 
 const path = require('path');
+const os = require('os');
+const crypto = require('crypto');
 
 const { routeQuestion } = require('../llamaRouter');
 const { processQuery } = require('../queryService');
@@ -179,7 +181,7 @@ async function main() {
   assert(unknownPlayer.response.summary.trim(), 'unknown player path returned empty summary');
 
   const degradedVector = await queryVectorDb('Virat Kohli', {
-    dbDir: path.join(__dirname, 'fixtures', 'definitely-missing-chroma-db')
+    dbDir: path.join(os.tmpdir(), `cricket-missing-chroma-${crypto.randomUUID()}`)
   });
   assert(degradedVector && degradedVector.available === false, 'missing Chroma path should degrade cleanly');
   assert(typeof degradedVector.warning === 'string' && degradedVector.warning.trim(), 'missing Chroma path should return a warning');

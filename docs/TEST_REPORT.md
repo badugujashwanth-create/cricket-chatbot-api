@@ -1,21 +1,29 @@
 # Test report
 
-Audited on 2026-07-17 using the checked-out `portfolio-polish` branch on Windows.
+Verified on 20 July 2026 from the `product-completion-2026` release candidate.
 
-| Command | Result | Evidence / notes |
-|---|---|---|
-| `npm ci` | Pass | 145 packages installed |
-| `npm run test:cases` | Pass | Nineteen routing/response query cases and the degraded-vector path passed in 6.5 seconds after missing-database short-circuiting was added |
-| Route enumeration | Pass | 19 API routes plus the non-API frontend catch-all were found in `server.js` |
-| Production startup | Pass | Express started with `NODE_ENV=production` and the optional daily ingestor disabled for the smoke check |
-| `GET /api/status` | Pass | HTTP 200; optional vector status accurately reported `missing` |
-| `POST /api/query` with `india team summary` | Pass | HTTP 200; frontend-compatible `type=team` and `extra.action=team_stats` |
-| Empty `POST /api/query` | Pass | HTTP 400 with a non-empty guidance summary |
+| Command | Result | Evidence |
+| --- | --- | --- |
+| `npm ci` | Pass | Lockfile installation completed |
+| `npm run test:cases` | Pass | 19 deterministic routing and response cases; missing Chroma short-circuits without a helper subprocess |
+| `npm run test:integration` | Pass | 5 real HTTP tests against an ephemeral local server |
+| `npm test` | Pass | 24 total configured checks |
+| `npm audit --omit=dev` | Pass | Zero known vulnerabilities in the complete runtime dependency tree |
+| `gitleaks stdin` on the staged release diff | Pass | No leaks found |
+| `gitleaks git . --redact` | Pass | No leaks found across 18 existing commits |
 
-## Overall status
+## HTTP coverage
 
-Verified for routing and degraded operation. A recognized team query now preserves its typed `team_stats` contract when the optional archive is empty instead of being downgraded to a generic summary.
+The integration suite verifies:
 
-The configured suite treats Chroma archive records as optional: it verifies that the loader returns an array and runs record-level assertions only when records exist. The current archive contains zero documents. The installed Python Chroma helper also reports a missing compiled `pydantic_core` module, so rebuilding the optional archive requires repairing that local Python environment and supplying the external dataset.
+- deterministic `/api/status` capability evidence with no local paths;
+- Helmet headers and removal of `X-Powered-By`;
+- repository-grounded LBW knowledge;
+- typed India-team degradation when archive statistics are absent;
+- empty-question `400` and unconfigured live-provider `503`;
+- denied and allowed CORS origins;
+- oversized JSON `413`.
 
-Warnings and missing checks remain limitations, even when another check passes.
+## Intentional limitations
+
+The suite does not claim optional live providers, a populated Chroma archive, model quality, Socket.IO scale, multi-process session consistency, authentication, or public infrastructure. Those remain separate authorization and environment gates.

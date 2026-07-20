@@ -424,10 +424,10 @@ async function runDailyIngestorOnce({
 
 function startDailyIngestor({
   intervalMs = DEFAULT_INTERVAL_MS,
-  runOnStart = String(process.env.RUN_DAILY_INGESTOR_ON_BOOT || 'true').trim().toLowerCase() === 'true',
+  runOnStart = String(process.env.RUN_DAILY_INGESTOR_ON_BOOT || 'false').trim().toLowerCase() === 'true',
   io = null
 } = {}) {
-  if (String(process.env.ENABLE_DAILY_INGESTOR || 'true').trim().toLowerCase() === 'false') {
+  if (String(process.env.ENABLE_DAILY_INGESTOR || 'false').trim().toLowerCase() === 'false') {
     return null;
   }
 

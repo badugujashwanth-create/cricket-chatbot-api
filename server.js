@@ -2,6 +2,8 @@ require('./loadEnv');
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const { rateLimit } = require('express-rate-limit');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
@@ -37,13 +39,52 @@ const {
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const frontendPath = path.join(__dirname, '../frontend/dist');
+const allowedOrigins = String(
+  process.env.CORS_ORIGINS || 'http://127.0.0.1:5173,http://localhost:5173'
+)
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+    const error = new Error('Origin is not allowed by CORS policy.');
+    error.statusCode = 403;
+    callback(error);
+  },
+  methods: ['GET', 'POST', 'OPTIONS']
+};
 const SESSION_CONTEXT_PRONOUN_REGEX = /\b(he|him|his|she|her|they|them|their)\b/i;
 const CHIT_CHAT_QUERY_REGEX = /^(hi|hello|hey|hii|heya|how are you|who are you|thanks|thank you)\b/i;
 const CACHE_BYPASS_QUERY_REGEX =
   /\b(vs|versus|compare|better|stronger|dangerous|most|highest|fastest|best|top|prediction|predict|why|choke|inconsistent|overrated|greatest|goat|strongest|upcoming|schedule|latest|today|current|live|captain|coach|owner|troph(?:y|ies)|titles?|history|founded|ground|stadium|retired|retirement)\b/i;
 
-app.use(cors());
-app.use(express.json());
+app.disable('x-powered-by');
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
+  })
+);
+app.use(cors(corsOptions));
+app.use(express.json({ limit: String(process.env.JSON_BODY_LIMIT || '32kb') }));
+app.use(
+  '/api',
+  rateLimit({
+    windowMs: Math.max(1_000, Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000)),
+    limit: Math.max(1, Number(process.env.RATE_LIMIT_MAX || 120)),
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    handler(_req, res) {
+      return res.status(429).json({
+        message: 'Too many API requests. Retry after the current rate-limit window.'
+      });
+    }
+  })
+);
 if (fs.existsSync(frontendPath)) {
   app.use(express.static(frontendPath));
 }
@@ -170,8 +211,8 @@ async function getVectorStatus() {
     : {};
   return {
     status: dbDir ? 'ready' : 'missing',
-    source: 'chroma',
-    db_dir: dbDir,
+    source: 'local_chroma',
+    db_configured: Boolean(dbDir),
     collection: String(manifest?.collection || process.env.CHROMA_COLLECTION || 'cricket_semantic_index'),
     counts: {
       documents: Number(manifest?.collection_count || 0),
@@ -180,12 +221,46 @@ async function getVectorStatus() {
       matches: Number(manifest?.match_docs || 0)
     },
     summary,
-    chroma_health: chromaHealth
+    chroma_health: {
+      mode: String(chromaHealth?.mode || 'local'),
+      available: Boolean(chromaHealth?.available),
+      manifest_present: Boolean(chromaHealth?.manifest_present),
+      helper_scripts_ready: Boolean(chromaHealth?.helper_scripts_ready),
+      warning: chromaHealth?.available ? '' : dbDir ? 'chroma_unavailable' : 'missing_chroma_db'
+    }
+  };
+}
+
+function envEnabled(name) {
+  return ['1', 'true', 'yes'].includes(String(process.env[name] || 'false').trim().toLowerCase());
+}
+
+function getRuntimeBoundaries() {
+  const providers = {
+    cricapi: Boolean(String(process.env.CRICAPI_KEY || '').trim()),
+    cricbuzz:
+      envEnabled('CRICBUZZ_ENABLED') && Boolean(String(process.env.CRICBUZZ_RAPIDAPI_KEY || '').trim()),
+    espn: envEnabled('ESPN_ENABLED'),
+    profile_enrichment: envEnabled('PROFILE_ENRICHMENT_ENABLED'),
+    local_llm: Boolean(String(process.env.LLM_ENDPOINT || process.env.LLM_BASE_URL || '').trim()),
+    openai: Boolean(String(process.env.OPENAI_API_KEY || '').trim()),
+    daily_ingestor: envEnabled('ENABLE_DAILY_INGESTOR')
+  };
+  const externalEnabled = Object.values(providers).some(Boolean);
+  return {
+    mode: externalEnabled ? 'explicit_external_opt_in' : 'deterministic_local',
+    dataset_boundary: 'repository_curated_snapshot',
+    live_scores_guaranteed: false,
+    provider_calls_opt_in: true,
+    providers
   };
 }
 
 app.get('/api/status', async (req, res) => {
-  return res.json(await getVectorStatus());
+  return res.json({
+    ...(await getVectorStatus()),
+    runtime: getRuntimeBoundaries()
+  });
 });
 
 function writeSseEvent(res, event, payload) {
@@ -887,10 +962,22 @@ app.get('*', (req, res) => {
   return res.status(503).send('Frontend build not found. Run the Vite build or dev server.');
 });
 
+app.use((error, _req, res, _next) => {
+  if (error?.type === 'entity.too.large') {
+    return res.status(413).json({ message: 'Request body exceeds the configured size limit.' });
+  }
+  if (Number(error?.statusCode) === 403) {
+    return res.status(403).json({ message: error.message || 'Request origin is not allowed.' });
+  }
+  console.error('Unhandled request error:', error);
+  return res.status(500).json({ message: 'Request failed.' });
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*'
+    origin: allowedOrigins,
+    methods: ['GET', 'POST']
   }
 });
 
@@ -921,6 +1008,7 @@ server.on('error', (error) => {
 });
 
 function startServer() {
+  if (server.listening) return server;
   server.listen(port, () => {
     const address = server.address();
     const activePort =
@@ -930,6 +1018,17 @@ function startServer() {
     console.log(`Server running on http://localhost:${activePort}`);
     startDailyIngestor({ io });
   });
+  return server;
 }
 
-startServer();
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = {
+  app,
+  server,
+  startServer,
+  getRuntimeBoundaries,
+  getVectorStatus
+};

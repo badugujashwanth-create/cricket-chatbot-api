@@ -8,7 +8,7 @@ const BASE_URL = 'https://api.cricapi.com/v1/';
 const API_KEY = String(process.env.CRICAPI_KEY || '').trim();
 const REQUEST_TIMEOUT_MS = Number(process.env.CRICAPI_TIMEOUT_MS || 10000);
 const CRICBUZZ_ENABLED = !['0', 'false', 'no'].includes(
-  normalizeText(process.env.CRICBUZZ_ENABLED || 'true')
+  normalizeText(process.env.CRICBUZZ_ENABLED || 'false')
 );
 const CRICBUZZ_RAPIDAPI_KEY = String(process.env.CRICBUZZ_RAPIDAPI_KEY || '').trim();
 const CRICBUZZ_RAPIDAPI_HOST = String(

@@ -1,31 +1,43 @@
-# Cricket Intelligence API architecture
+# Architecture
 
-Natural-language cricket query API backed by curated datasets, optional live providers, Chroma retrieval, and Socket.IO updates.
+## Product boundary
 
-## System view
+The API converts cricket questions into typed responses for the paired web client. Its verified release path is deterministic and repository-grounded. Chroma, live cricket feeds, enrichment providers, LLMs, and ingestion are optional adapters, not prerequisites.
 
-```mermaid
-flowchart LR
-  N0[Client] --> N1
-  N1[Express API] --> N2
-  N2[Query parser and intent gate] --> N3
-  N3[Dataset/provider services] --> N4
-  N4[Chroma/Ollama (optional)]
+```text
+HTTP / SSE / Socket.IO
+        |
+Express security boundary
+  CORS · body limit · rate limit · Helmet
+        |
+intent gate -> entity normalization -> query service -> typed response
+        |                         |
+repository JSON             optional adapters
+rules, terms, history       Chroma · CricAPI · Cricbuzz
+records, training           ESPN · profile enrichment · LLM
 ```
 
-## Component boundaries
+## Main components
 
-- **Client:** initiates the primary workflow.
-- **Express API:** owns one stage of the request or interaction flow.
-- **Query parser and intent gate:** owns one stage of the request or interaction flow.
-- **Dataset/provider services:** owns one stage of the request or interaction flow.
-- **Chroma/Ollama (optional):** provides the terminal integration or persistence boundary.
+- `server.js`: HTTP contracts, security middleware, SSE, Socket.IO, and lifecycle.
+- `llamaRouter.js`: deterministic intent routing with an optional explicitly configured LLM.
+- `queryService.js`: response orchestration and stable UI payload construction.
+- `knowledgeService.js`: repository JSON knowledge lookup.
+- `playerMaster.js`: deterministic player alias normalization.
+- `vectorIndexService.js` / `chromaService.js`: optional archive reads and honest degraded states.
+- `cricApiService.js`, `espnService.js`, `playerProfileService.js`: external boundaries disabled by default.
+- `workers/dailyIngestor.js`: opt-in provider ingestion; never starts by default.
 
-## Runtime and trust boundaries
+## Failure behavior
 
-A Chroma server, local helper, or provider credentials may be needed for enhanced retrieval; the current regression assertion is unresolved. Inputs crossing a network, filesystem, provider, or database boundary should be validated and logged without sensitive values. Optional integrations must fail clearly rather than being presented as successful.
+- Missing repository evidence returns guidance or typed unavailable data instead of invented statistics.
+- Missing provider credentials return explicit external-source errors.
+- Missing Chroma data returns `missing_chroma_db` without starting a helper for a nonexistent path.
+- Status responses sanitize machine paths and expose only boolean capabilities.
+- Provider enrichment failures do not upgrade a local fact into a live-data claim.
 
-## Technology
+## Data and state
 
-Node.js 22+, Express, Socket.IO, ChromaDB client, optional Ollama and cricket data providers.
+The repository JSON files are small curated snapshots. In-memory sessions retain conversational context for one process and expire after one hour. There is no account identity or durable user data. Optional Chroma and semantic-cache state are local operator-managed data.
 
+See [data provenance](DATA_PROVENANCE.md) and [limitations](LIMITATIONS.md).

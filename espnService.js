@@ -5,6 +5,9 @@ const { normalizeText, similarityScore } = require('./textUtils');
 
 const DEFAULT_TIMEOUT_MS = Number(process.env.ESPN_TIMEOUT_MS || 30000);
 const CACHE_TTL_MS = Number(process.env.ESPN_CACHE_TTL_MS || 30 * 60 * 1000);
+const ESPN_ENABLED = ['1', 'true', 'yes'].includes(
+  String(process.env.ESPN_ENABLED || 'false').trim().toLowerCase()
+);
 const responseCache = new Map();
 
 class EspnServiceError extends Error {
@@ -162,6 +165,13 @@ function rankSearchItems(items = [], query = '') {
 }
 
 async function searchPlayers({ q = '', limit = 5 } = {}) {
+  if (!ESPN_ENABLED) {
+    throw new EspnServiceError('ESPN enrichment is disabled by configuration.', 503, {
+      provider: 'espn',
+      source: 'external',
+      enabled: false
+    });
+  }
   const query = String(q || '').trim();
   if (!query) {
     throw new EspnServiceError('Query parameter "q" is required.', 400, { provider: 'espn' });
@@ -193,6 +203,13 @@ async function searchPlayers({ q = '', limit = 5 } = {}) {
 }
 
 async function getPlayerCareer({ playerId = '', teamSlug = 'ci', searchItem = null } = {}) {
+  if (!ESPN_ENABLED) {
+    throw new EspnServiceError('ESPN enrichment is disabled by configuration.', 503, {
+      provider: 'espn',
+      source: 'external',
+      enabled: false
+    });
+  }
   const cleanPlayerId = String(playerId || '').trim();
   if (!cleanPlayerId) {
     throw new EspnServiceError('Player id is required.', 400, { provider: 'espn' });

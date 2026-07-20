@@ -1,18 +1,27 @@
 # Recording guide
 
-## Preparation
+## Preflight
 
-1. Install dependencies using docs/DEVELOPMENT.md.
-2. Copy example environment files and use only local or synthetic values.
-3. Start the demo with scripts/run-demo.ps1 or the component-specific command.
-4. Confirm the complete workflow manually before recording.
-5. Close notifications, unrelated applications, password managers, and personal browser profiles.
+```powershell
+npm ci
+npm verify
+.\scripts\record-demo.ps1 -SmokeOnly
+```
 
-## Record
+The smoke pass verifies the real terminal window can be captured before the long take.
 
-This project needs a terminal or desktop recorder. Follow DEMO_SCRIPT.md; capture at 720p or 1080p and keep commands readable. The current machine did not have FFmpeg or a terminal recorder, so no video is claimed here.
+## Full recording
 
-## Post-production
+```powershell
+.\scripts\record-demo.ps1
+```
 
-Trim loading time only; do not splice in fake success states. Add demo-captions.vtt. If FFmpeg is available, create a compressed MP4 and preview GIF, then verify size and readability. Never commit a large raw capture.
+The recorder launches a dedicated PowerShell window, starts the API with all external features off, performs real requests, runs the real test/audit commands, synthesizes narration from `NARRATION.md`, and builds the final WebM plus verification frames.
 
+## Acceptance
+
+- duration at least 180 seconds;
+- 1280×720 VP9 video with Opus narration;
+- captions, thumbnail, SHA-256, and verification JSON present;
+- milestone frames show only the dedicated demo terminal;
+- no credentials, personal paths, notifications, or fake provider success.
