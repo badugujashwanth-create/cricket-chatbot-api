@@ -35,8 +35,9 @@ npm verify
 ## Current release evidence
 
 - 19 deterministic routing/response cases;
-- 5 real HTTP integration tests for status, knowledge, typed degradation, provider failure, CORS, headers, and request-size protection;
-- zero known npm dependency vulnerabilities at the v1.0.0 candidate;
+- 5 real HTTP integration tests for status, semantic-cache isolation, knowledge, typed degradation, provider failure, CORS, headers, and request-size protection;
+- zero known npm dependency vulnerabilities at the v1.0.1 candidate;
+- missing local archives bypass semantic-cache reads and writes, and disabled enrichment makes no Wikipedia request;
 - configurable origin allowlist, 32 kB default body limit, API rate limit, Helmet headers, and hidden Express signature;
 - narrated walkthrough longer than three minutes with captions, thumbnail, checksum, and inspected frames.
 
@@ -107,7 +108,7 @@ Provider data can be unavailable, stale, rate-limited, subscription-gated, or di
 | `GET` | `/api/cricapi/*` | Explicit external CricAPI boundary; `503` without a key |
 | `GET` | `/api/cricbuzz/player-card` | Explicit optional enrichment with local fallback |
 
-The response contract keeps `type`, `summary`, `stats`, and `extra.action` stable for the paired [Cricket Chatbot Web](https://github.com/badugujashwanth-create/cricket-chatbot-web) client.
+The response contract keeps `type`, `summary`, `stats`, and `extra.action` stable for the paired [Cricket Chatbot Web](https://github.com/badugujashwanth-create/cricket-chatbot-web) client. `extra.evidence_state` and `extra.archive_evidence` distinguish verified sources from a typed unavailable response.
 
 ## Security defaults
 
