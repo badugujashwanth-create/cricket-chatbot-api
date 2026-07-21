@@ -1,6 +1,6 @@
 # Test report
 
-Verified on 21 July 2026 from the `fix/player-unavailable-copy-v1.0.2` release candidate.
+Verified on 21 July 2026 from the v1.0.3 release candidate.
 
 | Command | Result | Evidence |
 | --- | --- | --- |
