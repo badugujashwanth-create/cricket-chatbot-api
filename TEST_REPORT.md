@@ -29,7 +29,7 @@ The chatbot was tested with regression queries for natural cricket questions. Th
 ## 3. Test commands run
 
 ```powershell
-cd Cricket_chatbot_Backend
+cd cricket-chatbot-api
 
 node -c .\queryService.js
 node -c .\naturalIntentGate.js
