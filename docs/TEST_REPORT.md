@@ -1,6 +1,6 @@
 # Test report
 
-Verified on 21 July 2026 from the `fix/archive-provenance-v1.0.1` release candidate.
+Verified on 21 July 2026 from the `fix/player-unavailable-copy-v1.0.2` release candidate.
 
 | Command | Result | Evidence |
 | --- | --- | --- |
@@ -21,6 +21,7 @@ The integration suite verifies:
 - Helmet headers and removal of `X-Powered-By`;
 - repository-grounded LBW knowledge;
 - typed India-team degradation with no archive label, image, description, or Wikipedia metadata when the archive and enrichment are disabled;
+- typed player degradation that does not promise disabled live or fallback enrichment;
 - empty-question `400` and unconfigured live-provider `503`;
 - denied and allowed CORS origins;
 - oversized JSON `413`.
