@@ -6,6 +6,10 @@ Dataset-grounded Express API for cricket questions, typed UI responses, and expl
 
 > This is a portfolio prototype over a small repository-curated snapshot. It does not guarantee live scores, exhaustive statistics, official rankings, predictions, or production availability.
 
+[![Watch the verified Cricket Intelligence API walkthrough](docs/demo/demo-thumbnail.png)](https://jashwanth-portfolio-ten.vercel.app/work/cricket-intelligence/)
+
+[Open MP4](https://jashwanth-portfolio-ten.vercel.app/media/cricket-api/demo.mp4) · [Download WebM](https://jashwanth-portfolio-ten.vercel.app/media/cricket-api/demo.webm) · [Captions](https://jashwanth-portfolio-ten.vercel.app/media/cricket-api/demo-captions.vtt)
+
 ## Verified workflow
 
 ```text
