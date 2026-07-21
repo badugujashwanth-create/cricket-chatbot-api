@@ -36,7 +36,7 @@ npm verify
 
 - 19 deterministic routing/response cases;
 - 5 real HTTP integration tests for status, semantic-cache isolation, knowledge, typed degradation, provider failure, CORS, headers, and request-size protection;
-- zero known npm dependency vulnerabilities at the v1.0.2 candidate;
+- zero known npm dependency vulnerabilities at the v1.0.3 release candidate;
 - missing local archives bypass semantic-cache reads and writes, and disabled enrichment makes no Wikipedia request;
 - configurable origin allowlist, 32 kB default body limit, API rate limit, Helmet headers, and hidden Express signature;
 - narrated walkthrough longer than three minutes with captions, thumbnail, checksum, and inspected frames.

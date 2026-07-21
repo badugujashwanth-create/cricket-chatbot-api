@@ -1,6 +1,6 @@
 # Deployment
 
-No public deployment is claimed for v1.0.2.
+No public deployment is claimed for v1.0.3.
 
 The API can run as a Node.js service with `npm ci` and `npm start`, but a public deployment requires explicit decisions for:
 
